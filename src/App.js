@@ -8,7 +8,7 @@ import Scores from './Components/Scores';
 
 /* FIREBASE */
 import firebase from "../src/firebase";
-const timeRef = firebase.database().ref('/count');
+const timeRef = firebase.database().ref();
 
 
 class App extends Component {
@@ -33,10 +33,19 @@ addToList = (count) => {
 
 componentDidMount() {
     timeRef.on('value', (snapshot) => {
-      console.log(snapshot.val());
-      this.setState({
-        time: snapshot.val(),
+      const stateObj = Object.entries(snapshot.val()).map(item => {
+        console.log("item", item);
+        return {
+          count: item[1].count,
+          id: item[0],
+          currentTextValue: item[1].currentTextValue
+        } 
       })
+      // this.setState({
+      //   time: snapshot.val(),
+      //   listOfNames: snapshot.child("newIndividualListItem").val() || []
+      // })
+      this.setState({ listOfNames: stateObj }); // any changes in firebase will update the stateObj. listening for when values in firebase change, then it will update listOfNames.
     })}
 
   componentWillUnmount() {
@@ -88,50 +97,52 @@ componentDidMount() {
       currentTextValue: this.state.currentTextValue,
       id: Date.now(),
       count: this.state.count
-    };
+    }; //the 
 
     const timeRef = firebase.database().ref();
       timeRef.push(newindividualListItem);
   
     
-    this.setState(prevState => ({
-      listOfNames: prevState.listOfNames.concat(newindividualListItem),
-      currentTextValue: "",
-    }));
+    // this.setState(prevState => ({
+    //   listOfNames: prevState.listOfNames.concat(newindividualListItem),
+    //   currentTextValue: "",
+    // }));
 
   
     
 
   }    
   render = () => {
+    console.log("state", this.state);
 
-    console.log(this.state);
-  
-  return <div className="App">
-        <div className="Timer">
-          <h1>{this.state.count}</h1>
-          <div>
-            <button onClick={this.startTimer.bind(this)}>Start</button>
-            <button onClick={this.stopTimer.bind(this)}>Stop</button>
-            <button onClick={this.resetTimer.bind(this)}>Reset</button>
+    return ( 
+      <div className="app-wrapper">
+        <div className="App">
+          <div className="Timer">
+            <h1>{this.state.count}</h1>
+            <div>
+              <button onClick={this.startTimer.bind(this)}>Start</button>
+              <button onClick={this.stopTimer.bind(this)}>Stop</button>
+              <button onClick={this.resetTimer.bind(this)}>Reset</button>
+            </div>
+          </div>
+
+          <div className="Gallery">
+            <h1 className="brushyTitle">BRUSHY.io</h1>
+
+            <Gallery count={this.state.count} />
+          </div>
+
+          <div className="finalTime">
+            <h2>Enter your name:</h2>
+
+            <Form onSubmit={this.handleSubmit} onChange={this.handleChange} currentTextValue={this.state.currentTextValue} addToList={this.addToList} listItems={this.state.listOfNames} placeholder="Enter your name" showResults={this.state.showResults} />
+
+            <Scores listOfNames={this.state.listOfNames} />
           </div>
         </div>
-
-        <div className="Gallery">
-          
-            <h1 className="brushyTitle">BRUSHY.io</h1>
-  
-          <Gallery count={this.state.count} />
-        </div>
-
-        <div className="finalTime">
-          <h2>Enter your name:</h2>
-
-          <Form onSubmit={this.handleSubmit} onChange={this.handleChange} currentTextValue={this.state.currentTextValue} addToList={this.addToList} listItems={this.state.listOfNames} placeholder="Enter your name" showResults={this.state.showResults} />
-
-          <Scores listOfNames={this.state.listOfNames} />
-        </div>
-      </div>;
+      </div>
+    )
   }
 
 }
