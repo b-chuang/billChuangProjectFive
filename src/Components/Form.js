@@ -6,10 +6,8 @@ class Form extends Component {
         super();
         this.state = {
             currentTextValue: [],
-
         }
     }
-
     //when the form submits send the string from the input to App.js
     
 

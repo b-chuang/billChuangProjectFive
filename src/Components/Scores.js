@@ -3,9 +3,19 @@ import React from 'react';
 
 class Scores extends React.Component {
     render() {
+
+      
+      const lastFour = this.props.listOfNames.slice(-5);
+      if (lastFour.length < 6) {
+        lastFour.shift();
+      }
+      /* console.log(this.props.listOfNames);
+      console.log(lastFour); */
+      
+      
         return <div className="scoreDiv">
             <ul>
-              {this.props.listOfNames.map(individualListItem => (
+              {lastFour.map(individualListItem => (
                 <li key={individualListItem.id}>
                 <h3 className="scoreList">NAME:</h3>
                 <h4 className="scoreList">{individualListItem.currentTextValue} &#32;</h4>
